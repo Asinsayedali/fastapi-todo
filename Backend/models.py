@@ -38,7 +38,15 @@ class Login(SQLModel):
 #token schema
 class Token(SQLModel):
     access_token: str
+    refresh_token: str | None = None
     token_type: str
 
 class TokenData(SQLModel):
-    email: str
+    username: str
+    token_type: str
+
+class BlacklistedToken(SQLModel, table=True):
+    id: int | None = Field(default=None, primary_key=True)
+    token: str = Field(index=True)
+    blacklisted_at: datetime = Field(default_factory=datetime.utcnow)
+    expires_at: datetime

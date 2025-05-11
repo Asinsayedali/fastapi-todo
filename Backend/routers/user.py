@@ -1,6 +1,7 @@
-from fastapi import APIRouter, status, HTTPException
+from fastapi import APIRouter, status, HTTPException, Depends
 from ..database import SessionDep
 from sqlmodel import select
+from ..routers import authentication
 from ..password import get_hashed_password, verify_password
 from .. import models
 
@@ -22,7 +23,7 @@ def create_user(request:models.UserCreate, db: SessionDep):
     return  user
 
 @router.get("/{id}",response_model = models.UserRead)
-def get_user_data(id: int,db: SessionDep):
+def get_user_data(id: int, db: SessionDep, current_user: models.User = Depends(authentication.get_current_user)):
     user = db.exec(select(models.User).where(models.User.id==id)).first()
     if not user:
          raise HTTPException(status_code=400, detail = "User does not exists!") 
