@@ -29,3 +29,16 @@ class Todo(SQLModel, table=True):
     completed: bool = Field(default=False)
     completed_at: datetime | None = None
     user_id: int = Field(foreign_key="user.id")
+
+#login schema
+class Login(SQLModel):
+    username: str
+    password: str
+
+#token schema
+class Token(SQLModel):
+    access_token: str
+    token_type: str
+
+class TokenData(SQLModel):
+    email: str

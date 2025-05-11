@@ -4,9 +4,12 @@ from sqlmodel import select
 from ..password import get_hashed_password, verify_password
 from .. import models
 
-router = APIRouter()
-    
-@router.post("/signup",response_model= models.UserRead,status_code=status.HTTP_201_CREATED, tags=["Users"])
+router = APIRouter(
+    prefix="/user",
+    tags=["Users"]
+)
+
+@router.post("/signup",response_model= models.UserRead,status_code=status.HTTP_201_CREATED)
 def create_user(request:models.UserCreate, db: SessionDep):
     db_user = db.exec(select(models.User).where(models.User.email == request.email)).first()
     if db_user:
@@ -18,7 +21,7 @@ def create_user(request:models.UserCreate, db: SessionDep):
     db.refresh(user)
     return  user
 
-@router.get("/user/{id}",response_model = models.UserRead,tags=["Users"])
+@router.get("/{id}",response_model = models.UserRead)
 def get_user_data(id: int,db: SessionDep):
     user = db.exec(select(models.User).where(models.User.id==id)).first()
     if not user:
