@@ -1,0 +1,7 @@
+passlib[bcrypt]
+fastapi[standard]
+sqlmodel
+psycopg2
+pyjwt
+python-jose
+pytz
