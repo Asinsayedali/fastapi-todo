@@ -21,7 +21,7 @@ def create_todo(db: SessionDep, request: models.TodoCreate,current_user: models.
     db.refresh(todo)
     return todo
 
-## List todo according to status of completion and due time.
+## get list of todo according to status of completion and due time.
 @router.get("/list",response_model=models.CategorizedTodos,status_code=status.HTTP_200_OK)
 def get_todos(db:SessionDep, current_user: models.User = Depends(authentication.get_current_user)):
     todo = db.exec(select(models.Todo).where(models.Todo.user_id==current_user.id)).all()

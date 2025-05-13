@@ -8,6 +8,7 @@ from .routers import user, authentication, todo
 async def lifespan(app:FastAPI):
     init_db()
     yield
+    
 app = FastAPI(lifespan=lifespan)
 app.include_router(user.router)
 app.include_router(authentication.router)

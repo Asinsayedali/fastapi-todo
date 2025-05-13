@@ -2,13 +2,16 @@ from fastapi import APIRouter, status, HTTPException, Depends
 from ..database import SessionDep
 from sqlmodel import select
 from ..routers import authentication
-from ..password import get_hashed_password, verify_password
-from .. import models
+from fastapi.security import OAuth2PasswordRequestForm
+from ..password import get_hashed_password
+from .. import models, password
 
 router = APIRouter(
     prefix="/user",
     tags=["Users"]
 )
+
+
 
 @router.post("/signup",response_model= models.UserRead,status_code=status.HTTP_201_CREATED)
 def create_user(request:models.UserCreate, db: SessionDep):
@@ -22,9 +25,18 @@ def create_user(request:models.UserCreate, db: SessionDep):
     db.refresh(user)
     return  user
 
-@router.get("/{id}",response_model = models.UserRead, status_code=status.HTTP_302_FOUND)
-def get_user_data(id: int, db: SessionDep, current_user: models.User = Depends(authentication.get_current_user)):
-    user = db.exec(select(models.User).where(models.User.id==id)).first()
+@router.post("/login")  
+def login( db: SessionDep, form_data: OAuth2PasswordRequestForm = Depends()):
+    user = db.exec(select(models.User).where(models.User.email==form_data.username)).first()
     if not user:
-         raise HTTPException(status_code=400, detail = "User does not exists!") 
-    return user
+            raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect username or password",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    if not password.verify_password(form_data.password,user.password):
+        raise HTTPException(status_code=400, detail = "Invalid credentials")
+    access_token = authentication.create_access_token(
+        data={"sub": user.email}
+    )
+    return models.Token(access_token=access_token, token_type="bearer")
