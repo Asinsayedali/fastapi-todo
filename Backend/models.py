@@ -1,5 +1,6 @@
 from sqlmodel import Field, Session, create_engine, SQLModel, select
 from datetime import datetime
+from typing import Optional
 # User Table
 class User(SQLModel, table=True):
     id:int | None = Field(default=None, primary_key=True)
@@ -44,6 +45,7 @@ class Token(SQLModel):
 class TokenData(SQLModel):
     username: str
     token_type: str | None = None
+
 #Todo schemas
 class TodoCreate(SQLModel):
     title: str
@@ -63,3 +65,9 @@ class CategorizedTodos(SQLModel):
     completed: list[TodoRead]
     not_completed: list[TodoRead]
     due_over: list[TodoRead]
+
+class TodoUpdate(SQLModel):
+    description: Optional[str] = None
+    due_time: Optional[datetime] = None
+    completed: Optional[bool] = None
+    completed_at: Optional[datetime] = None

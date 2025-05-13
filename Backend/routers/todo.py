@@ -53,6 +53,29 @@ def get_todos(db:SessionDep, current_user: models.User = Depends(authentication.
 
     return categorized
 
+#update a todo with its id
+@router.put("/update/{todo_id}", response_model=models.TodoRead,status_code=status.HTTP_202_ACCEPTED)
+def update_todo(db:SessionDep, todo_id: int, request: models.TodoUpdate, current_user: models.User = Depends(authentication.get_current_user)):
+    query = select(models.Todo).where(models.Todo.user_id==current_user.id , models.Todo.id==todo_id)
+    todo = db.exec(query).first()
+
+    if not todo:
+        raise HTTPException(status_code=404, detail="Todo not found")
+    update_data = request.dict(exclude_unset=True)
+    if update_data.get("completed") and not update_data.get("completed_at"):
+        update_data["completed_at"] = datetime.utcnow()
+    if "description" in update_data:
+        todo.description = update_data["description"]
+    if "completed_at" in update_data:
+        todo.completed_at = update_data["completed_at"]
+    if "due_time" in update_data:
+        todo.due_time = update_data["due_time"]
+    if "completed" in update_data:
+        todo.completed = update_data["completed"]
+
+
+    db.commit()
+    return todo
 
 
 #Todo delete endpoint
