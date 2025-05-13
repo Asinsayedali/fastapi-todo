@@ -19,7 +19,6 @@ A simple and secure Todo management API using **FastAPI** and **PostgreSQL**, wi
 | PostgreSQL as database        | ✅         |
 | Git version control history   | ✅         |
 | Uploaded to GitHub            | ✅         |
-| Completed before **May 12**   | ✅         |
 
 ---
 
