@@ -58,3 +58,8 @@ class TodoRead(SQLModel):
     description: str
     created_at: datetime
     due_time: datetime
+
+class CategorizedTodos(SQLModel):
+    completed: list[TodoRead]
+    not_completed: list[TodoRead]
+    due_over: list[TodoRead]
