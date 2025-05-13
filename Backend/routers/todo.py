@@ -77,6 +77,18 @@ def update_todo(db:SessionDep, todo_id: int, request: models.TodoUpdate, current
     db.commit()
     return todo
 
+#update the status as completed with id
+@router.put("/{todo_id}/status",status_code=status.HTTP_202_ACCEPTED)
+def update_status(db:SessionDep, todo_id: int, current_user: models.User = Depends(authentication.get_current_user)):
+    query = select(models.Todo).where(models.Todo.user_id==current_user.id , models.Todo.id==todo_id)
+    todo = db.exec(query).first()
+    if not todo:
+        raise HTTPException(status_code=404, detail="Todo not found")
+    todo.completed = True
+    db.commit()
+    return {"message": "Status updated successfully!"}
+
+
 
 #Todo delete endpoint
 @router.delete("/{todo_id}", status_code=status.HTTP_202_ACCEPTED)
