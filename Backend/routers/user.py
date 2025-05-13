@@ -22,7 +22,7 @@ def create_user(request:models.UserCreate, db: SessionDep):
     db.refresh(user)
     return  user
 
-@router.get("/{id}",response_model = models.UserRead)
+@router.get("/{id}",response_model = models.UserRead, status_code=status.HTTP_302_FOUND)
 def get_user_data(id: int, db: SessionDep, current_user: models.User = Depends(authentication.get_current_user)):
     user = db.exec(select(models.User).where(models.User.id==id)).first()
     if not user:
