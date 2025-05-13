@@ -43,5 +43,18 @@ class Token(SQLModel):
 
 class TokenData(SQLModel):
     username: str
-    token_type: str
+    token_type: str | None = None
+#Todo schemas
+class TodoCreate(SQLModel):
+    title: str
+    description: str
+    created_at: datetime
+    due_time: datetime
+    user_id: int
 
+class TodoRead(SQLModel):
+    id: int
+    title: str
+    description: str
+    created_at: datetime
+    due_time: datetime

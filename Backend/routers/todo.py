@@ -10,6 +10,10 @@ router = APIRouter(
     tags=["Todo"]
 )
 
-@router.post("/create")
-def create_todo():
-    return "todo creation end point"
+@router.post("/create",response_model=models.TodoRead,status_code= status.HTTP_201_CREATED)
+def create_todo(db: SessionDep, request: models.TodoCreate,current_user: models.User = Depends(authentication.get_current_user)):
+    todo = models.Todo(title=request.title, description=request.description, created_at=request.created_at, due_time=request.due_time, user_id=request.user_id)
+    db.add(todo)
+    db.commit()
+    db.refresh(todo)
+    return todo
