@@ -62,7 +62,7 @@ def update_todo(db:SessionDep, todo_id: int, request: models.TodoUpdate, current
     if not todo:
         raise HTTPException(status_code=404, detail="Todo not found")
     update_data = request.dict(exclude_unset=True)
-    if update_data.get("completed") and not update_data.get("completed_at"):
+    if not update_data.get("completed") and not update_data.get("completed_at", False):
         update_data["completed_at"] = datetime.utcnow()
     if "description" in update_data:
         todo.description = update_data["description"]
@@ -84,7 +84,10 @@ def update_status(db:SessionDep, todo_id: int, current_user: models.User = Depen
     todo = db.exec(query).first()
     if not todo:
         raise HTTPException(status_code=404, detail="Todo not found")
+    
+    completed_At = datetime.utcnow()
     todo.completed = True
+    todo.completed_at = completed_At
     db.commit()
     return {"message": "Status updated successfully!"}
 
