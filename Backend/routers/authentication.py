@@ -1,9 +1,9 @@
 from fastapi import APIRouter, HTTPException, status, Depends
 from typing import Annotated
 from sqlmodel import select
-from .. import models
+from ..db import models
 from dotenv import load_dotenv
-from ..database import SessionDep, get_session
+from ..db.database import SessionDep, get_session
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from datetime import datetime, timedelta, timezone
 from jose import jwt, JWTError

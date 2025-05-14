@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
-from Backend.database import init_db
+from Backend.db.database import init_db
 from .routers import user, authentication, todo
 
 

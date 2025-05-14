@@ -1,10 +1,12 @@
 from fastapi import APIRouter, status, HTTPException, Depends
-from ..database import SessionDep
+
+from ..db import models
+from ..db.database import SessionDep
 from sqlmodel import select
 from ..routers import authentication
 from fastapi.security import OAuth2PasswordRequestForm
 from ..password import get_hashed_password
-from .. import models, password
+from .. import password
 
 router = APIRouter(
     prefix="/user",
