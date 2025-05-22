@@ -61,15 +61,16 @@ class ConnectionSetup:
     
 connection_manager = ConnectionSetup()
 
-@router.websocket("/{user_id}/Chatroom")
+@router.websocket("/Chatroom/{user_id}")
 async def chatroom_endpoint(websocket: WebSocket, user_id: int, db: SessionDep):
     await connection_manager.connect(websocket)
     user = db.exec(select(models.User).where(models.User.id==user_id)).first()
     username = user.name if user else f"user#{user_id}"
-    await connection_manager.broadcast(f"{username} has joined the room.")
+    await connection_manager.broadcast(websocket,f"{username} has joined the room.")
     try:
         while True:
             data = await websocket.receive_text()
-            await connection_manager.broadcast(message=data, websocket=websocket)
+            await connection_manager.broadcast(websocket, f"{username}: {data}")
     except WebSocketDisconnect:
         connection_manager.disconnect(websocket)
+        await connection_manager.broadcast(websocket,f"{username} has left the room.")
