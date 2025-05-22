@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from contextlib import asynccontextmanager
 from Backend.db.database import init_db
 from .routers import user, authentication, todo
+from typing import List
 
 
 @asynccontextmanager
@@ -16,6 +17,5 @@ app.include_router(todo.router)
 @app.get("/")
 def read_root():
     return {"message": "Hello, World!"}
-
 
 

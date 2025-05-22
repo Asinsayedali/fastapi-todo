@@ -1,5 +1,5 @@
-from fastapi import APIRouter, status, HTTPException, Depends
-
+from fastapi import APIRouter, status, HTTPException, Depends, WebSocket, WebSocketDisconnect
+from typing import List
 from ..db import models
 from ..db.database import SessionDep
 from sqlmodel import select
@@ -42,3 +42,34 @@ def login( db: SessionDep, form_data: OAuth2PasswordRequestForm = Depends()):
         data={"sub": user.email}
     )
     return models.Token(access_token=access_token, token_type="bearer")
+
+class ConnectionSetup:
+    def __init__(self):
+        self.active_connections: List[WebSocket] = []
+    
+    async def connect(self, websocket:WebSocket):
+        await websocket.accept()
+        self.active_connections.append(websocket)
+
+    def disconnect(self, websocket:WebSocket):
+        self.active_connections.remove(websocket)
+    
+    async def broadcast(self, websocket:WebSocket, message: str):
+        for connection in self.active_connections:
+            if connection!= websocket:
+               await connection.send_text(message)
+    
+connection_manager = ConnectionSetup()
+
+@router.websocket("/{user_id}/Chatroom")
+async def chatroom_endpoint(websocket: WebSocket, user_id: int, db: SessionDep):
+    await connection_manager.connect(websocket)
+    user = db.exec(select(models.User).where(models.User.id==user_id)).first()
+    username = user.name if user else f"user#{user_id}"
+    await connection_manager.broadcast(f"{username} has joined the room.")
+    try:
+        while True:
+            data = await websocket.receive_text()
+            await connection_manager.broadcast(message=data, websocket=websocket)
+    except WebSocketDisconnect:
+        connection_manager.disconnect(websocket)
